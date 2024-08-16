@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "binary_dir",
+		"source" : "/home/disnejar/Documents/Projects/Colosseum/glfw"
+	}
+}

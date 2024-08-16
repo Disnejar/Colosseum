@@ -1,0 +1,127 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "binary_dir",
+					"childIndexes" : 
+					[
+						2
+					],
+					"jsonFile" : "directory-binary_dir-Debug-71553df46d26deb2f91d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.4"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "/home/disnejar/Documents/Projects/Colosseum/glfw"
+				},
+				{
+					"build" : "binary_dir/src",
+					"jsonFile" : "directory-binary_dir.src-Debug-2642b42f46aa0b9f0849.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.4"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/home/disnejar/Documents/Projects/Colosseum/glfw/src",
+					"targetIndexes" : 
+					[
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Colosseum",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2
+					],
+					"name" : "GLFW",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Colloseum::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Colloseum-Debug-8cf109062694b096ff04.json",
+					"name" : "Colloseum",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "glfw::@0d9120013b5547956b1a",
+					"jsonFile" : "target-glfw-Debug-2ecc9a00b0c2956b6e63.json",
+					"name" : "glfw",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "update_mappings::@0d9120013b5547956b1a",
+					"jsonFile" : "target-update_mappings-Debug-535fb846d18dec69f651.json",
+					"name" : "update_mappings",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/disnejar/Documents/Projects/Colosseum/build",
+		"source" : "/home/disnejar/Documents/Projects/Colosseum/src"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

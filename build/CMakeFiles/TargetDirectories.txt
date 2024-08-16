@@ -1,0 +1,9 @@
+/home/disnejar/Documents/Projects/Colosseum/build/CMakeFiles/Colloseum.dir
+/home/disnejar/Documents/Projects/Colosseum/build/CMakeFiles/edit_cache.dir
+/home/disnejar/Documents/Projects/Colosseum/build/CMakeFiles/rebuild_cache.dir
+/home/disnejar/Documents/Projects/Colosseum/build/binary_dir/CMakeFiles/edit_cache.dir
+/home/disnejar/Documents/Projects/Colosseum/build/binary_dir/CMakeFiles/rebuild_cache.dir
+/home/disnejar/Documents/Projects/Colosseum/build/binary_dir/src/CMakeFiles/glfw.dir
+/home/disnejar/Documents/Projects/Colosseum/build/binary_dir/src/CMakeFiles/update_mappings.dir
+/home/disnejar/Documents/Projects/Colosseum/build/binary_dir/src/CMakeFiles/edit_cache.dir
+/home/disnejar/Documents/Projects/Colosseum/build/binary_dir/src/CMakeFiles/rebuild_cache.dir
