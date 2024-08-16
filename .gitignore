@@ -1,7 +1,6 @@
 # Directories
-.vs/
-bin/
-bin-int/
+.vscode/
+build/
 
 # Files
 *.vcxproj
@@ -9,5 +8,4 @@ bin-int/
 *.vcxproj.filters
 *.sln
 
-# Exclude
-!vendor/bin
+CMakePresets.json
