@@ -1,5 +1,5 @@
 #include "App.h"
-#include "Utils/Image.h"
+#include "Data/Image.h"
 
 int main(){
     Colosseum::App::Run();

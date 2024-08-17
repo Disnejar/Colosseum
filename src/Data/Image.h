@@ -1,6 +1,6 @@
 #pragma once
 
-#include <filesystem>
+#include <string>
 #include "imgui_impl_vulkan.h"
 
 namespace Colosseum {
@@ -11,7 +11,7 @@ namespace Colosseum {
         uint32_t Channels = 4;
 
     private:
-        std::filesystem::path   _filepath;
+        std::string             _filepath;
 
         VkDescriptorSet         _vkDescriptorSet        = nullptr;
         VkImageView             _vkImageView            = nullptr;

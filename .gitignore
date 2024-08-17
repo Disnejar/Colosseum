@@ -10,4 +10,3 @@ build/
 *.o
 
 CMakePresets.json
-src/main
