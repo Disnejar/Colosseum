@@ -88,5 +88,8 @@ namespace Colosseum {
         static int Run();
         static void AddLayer(std::shared_ptr<Layer> layer_ptr);
         static void RemoveLayer(std::shared_ptr<Layer> layer_ptr);
+
+        static VkPhysicalDevice* GetPhisycalDevice() { return &g_PhysicalDevice; };
+        static VkDevice* GetDevice() { return &g_Device; };
     };
 }

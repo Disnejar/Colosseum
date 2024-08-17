@@ -361,6 +361,7 @@ namespace Colosseum{
             VkDescriptorPoolSize pool_sizes[] =
             {
                 { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
+                { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
             };
             VkDescriptorPoolCreateInfo pool_info = {};
             pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;

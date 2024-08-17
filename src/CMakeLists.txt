@@ -40,7 +40,11 @@ set(LIBRARIES "glfw;Vulkan::Vulkan")
 # Use vulkan headers from glfw:
 include_directories(${GLFW_DIR}/deps)
 
-file(GLOB SRC *.cpp)
+set(STB_DIR ../stb)
+include_directories(${STB_DIR})
+link_directories(${STB_DIR})
+
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS *.cpp)
 
 add_executable(Colloseum ${SRC} ${IMGUI_SRC})
 target_link_libraries(Colloseum ${LIBRARIES})

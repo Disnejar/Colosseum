@@ -7,5 +7,7 @@ build/
 *.vcxproj.user
 *.vcxproj.filters
 *.sln
+*.o
 
 CMakePresets.json
+src/main
