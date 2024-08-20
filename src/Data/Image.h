@@ -2,16 +2,18 @@
 
 #include <string>
 #include "imgui_impl_vulkan.h"
+#include "../Utils.h"
 
 namespace Colosseum {
     class Image{
     public:
-        uint32_t Width = 0;
-        uint32_t Height = 0;
-        uint32_t Channels = 4;
+        int Width = 0;
+        int Height = 0;
+        int Channels = 4;
 
     private:
         std::string             _filepath;
+        size_t                  _alignedSize;
 
         VkDescriptorSet         _vkDescriptorSet        = nullptr;
         VkImageView             _vkImageView            = nullptr;
@@ -20,11 +22,17 @@ namespace Colosseum {
         VkSampler               _vkSampler              = nullptr;
         VkBuffer                _vkUploadBuffer         = nullptr;
         VkDeviceMemory          _vkUploadBufferMemory   = nullptr;
+
     
     public:
-        Image();
+        Image(std::string path);
+        Image(int width, int height, const void *data, int channels);
+        ~Image();
 
     private:
-
+        void AllocateMemory(uint64_t size);
+        void Release();
+        void SetData(const void *data);
+        void Resize(int width, int height);
     };
 }
