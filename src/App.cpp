@@ -3,7 +3,30 @@
 namespace Colosseum{
     namespace App
     {
-        int Run()
+        VkAllocationCallbacks *g_Allocator = nullptr;
+        VkInstance g_Instance = VK_NULL_HANDLE;
+        VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
+        VkDevice g_Device = VK_NULL_HANDLE;
+        uint32_t g_QueueFamily = (uint32_t)-1;
+        VkQueue g_Queue = VK_NULL_HANDLE;
+        VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
+        VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
+        VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
+        ImGui_ImplVulkanH_Window g_MainWindowData;
+        int g_MinImageCount = 2;
+        bool g_SwapChainRebuild = false;
+
+        GLFWwindow *g_glfwWindow = nullptr;
+        ImGui_ImplVulkanH_Window *g_vulkanWindow = nullptr;
+
+        std::vector<std::vector<VkCommandBuffer>> g_AllocatedCommandBuffers;
+        std::vector<std::vector<std::function<void()>>> g_ResourceFreeQueue;
+
+        uint32_t g_CurrentFrameIndex = 0;
+
+        std::vector<std::shared_ptr<Layer>> g_LayerStack {};
+
+        int Initialise()
         {
             glfwSetErrorCallback(Utils::glfw_error_callback);
             if (!glfwInit())
@@ -11,44 +34,45 @@ namespace Colosseum{
 
             // Create window with Vulkan context
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-            GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+Vulkan example", nullptr, nullptr);
+            g_glfwWindow = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+Vulkan example", nullptr, nullptr);
             if (!glfwVulkanSupported())
             {
                 printf("GLFW: Vulkan Not Supported\n");
                 return 1;
             }
 
-            ImVector<const char*> extensions;
+            ImVector<const char *> extensions;
             uint32_t extensions_count = 0;
-            const char** glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+            const char **glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
             for (uint32_t i = 0; i < extensions_count; i++)
                 extensions.push_back(glfw_extensions[i]);
             SetupVulkan(extensions);
 
             // Create Window Surface
             VkSurfaceKHR surface;
-            VkResult err = glfwCreateWindowSurface(g_Instance, window, g_Allocator, &surface);
+            VkResult err = glfwCreateWindowSurface(g_Instance, g_glfwWindow, g_Allocator, &surface);
             Utils::check_vk_result(err);
 
             // Create Framebuffers
             int w, h;
-            glfwGetFramebufferSize(window, &w, &h);
-            ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
-            SetupVulkanWindow(wd, surface, w, h);
+            glfwGetFramebufferSize(g_glfwWindow, &w, &h);
+            g_vulkanWindow = &g_MainWindowData;
+            SetupVulkanWindow(g_vulkanWindow, surface, w, h);
 
             // Setup Dear ImGui context
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
-            ImGuiIO& io = ImGui::GetIO(); (void)io;
-            io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-            io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+            ImGuiIO &io = ImGui::GetIO();
+            (void)io;
+            io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+            io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
 
             // Setup Dear ImGui style
             ImGui::StyleColorsDark();
-            //ImGui::StyleColorsLight();
+            // ImGui::StyleColorsLight();
 
             // Setup Platform/Renderer backends
-            ImGui_ImplGlfw_InitForVulkan(window, true);
+            ImGui_ImplGlfw_InitForVulkan(g_glfwWindow, true);
             ImGui_ImplVulkan_InitInfo init_info = {};
             init_info.Instance = g_Instance;
             init_info.PhysicalDevice = g_PhysicalDevice;
@@ -57,10 +81,10 @@ namespace Colosseum{
             init_info.Queue = g_Queue;
             init_info.PipelineCache = g_PipelineCache;
             init_info.DescriptorPool = g_DescriptorPool;
-            init_info.RenderPass = wd->RenderPass;
+            init_info.RenderPass = g_vulkanWindow->RenderPass;
             init_info.Subpass = 0;
             init_info.MinImageCount = g_MinImageCount;
-            init_info.ImageCount = wd->ImageCount;
+            init_info.ImageCount = g_vulkanWindow->ImageCount;
             init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
             init_info.Allocator = g_Allocator;
             init_info.CheckVkResultFn = Utils::check_vk_result;
@@ -74,18 +98,23 @@ namespace Colosseum{
             // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
             // - Read 'docs/FONTS.md' for more instructions and details.
             // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-            //io.Fonts->AddFontDefault();
-            //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-            //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-            //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-            //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-            //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-            //IM_ASSERT(font != nullptr);
+            // io.Fonts->AddFontDefault();
+            // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+            // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+            // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+            // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+            // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+            // IM_ASSERT(font != nullptr);
 
+            return 0;
+        }
+
+        int Run()
+        {
             ImVec4 clear_color = ImVec4(0.21f, 0.22f, 0.25f, 1.00f);
 
             // Main loop
-            while (!glfwWindowShouldClose(window))
+            while (!glfwWindowShouldClose(g_glfwWindow))
             {
                 // Poll and handle events (inputs, window resize, etc.)
                 // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -96,7 +125,7 @@ namespace Colosseum{
 
                 // Resize swap chain?
                 int fb_width, fb_height;
-                glfwGetFramebufferSize(window, &fb_width, &fb_height);
+                glfwGetFramebufferSize(g_glfwWindow, &fb_width, &fb_height);
                 if (fb_width > 0 && fb_height > 0 && (g_SwapChainRebuild || g_MainWindowData.Width != fb_width || g_MainWindowData.Height != fb_height))
                 {
                     ImGui_ImplVulkan_SetMinImageCount(g_MinImageCount);
@@ -104,7 +133,7 @@ namespace Colosseum{
                     g_MainWindowData.FrameIndex = 0;
                     g_SwapChainRebuild = false;
                 }
-                if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
+                if (glfwGetWindowAttrib(g_glfwWindow, GLFW_ICONIFIED) != 0)
                 {
                     ImGui_ImplGlfw_Sleep(10);
                     continue;
@@ -127,17 +156,22 @@ namespace Colosseum{
                 const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
                 if (!is_minimized)
                 {
-                    wd->ClearValue.color.float32[0] = clear_color.x * clear_color.w;
-                    wd->ClearValue.color.float32[1] = clear_color.y * clear_color.w;
-                    wd->ClearValue.color.float32[2] = clear_color.z * clear_color.w;
-                    wd->ClearValue.color.float32[3] = clear_color.w;
-                    FrameRender(wd, draw_data);
-                    FramePresent(wd);
+                    g_vulkanWindow->ClearValue.color.float32[0] = clear_color.x * clear_color.w;
+                    g_vulkanWindow->ClearValue.color.float32[1] = clear_color.y * clear_color.w;
+                    g_vulkanWindow->ClearValue.color.float32[2] = clear_color.z * clear_color.w;
+                    g_vulkanWindow->ClearValue.color.float32[3] = clear_color.w;
+                    FrameRender(g_vulkanWindow, draw_data);
+                    FramePresent(g_vulkanWindow);
                 }
             }
 
+            return 0;
+        }
+
+        int Cleanup()
+        {
             // Cleanup
-            err = vkDeviceWaitIdle(g_Device);
+            VkResult err = vkDeviceWaitIdle(g_Device);
             Utils::check_vk_result(err);
             ImGui_ImplVulkan_Shutdown();
             ImGui_ImplGlfw_Shutdown();
@@ -146,7 +180,7 @@ namespace Colosseum{
             CleanupVulkanWindow();
             CleanupVulkan();
 
-            glfwDestroyWindow(window);
+            glfwDestroyWindow(g_glfwWindow);
             glfwTerminate();
 
             return 0;
@@ -322,10 +356,19 @@ namespace Colosseum{
             // If you wish to load e.g. additional textures you may need to alter pools sizes.
             {
                 VkDescriptorPoolSize pool_sizes[] =
-                {
-                    { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
-                    { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-                };
+                    {
+                        {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+                        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+                        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+                        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+                        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+                        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+                        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+                        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+                        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+                        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+                        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}
+                    };
                 VkDescriptorPoolCreateInfo pool_info = {};
                 pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
                 pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;

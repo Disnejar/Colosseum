@@ -29,10 +29,12 @@ namespace Colosseum {
         Image(int width, int height, const void *data, int channels);
         ~Image();
 
+        VkDescriptorSet GetDescriptor() const { return _vkDescriptorSet; };
+        void SetData(const void *data);
+        void Resize(int width, int height);
+
     private:
         void AllocateMemory(uint64_t size);
         void Release();
-        void SetData(const void *data);
-        void Resize(int width, int height);
     };
 }

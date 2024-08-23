@@ -55,25 +55,28 @@ namespace Colosseum {
     namespace App
     {
         // Data
-        static VkAllocationCallbacks*   g_Allocator = nullptr;
-        static VkInstance               g_Instance = VK_NULL_HANDLE;
-        static VkPhysicalDevice         g_PhysicalDevice = VK_NULL_HANDLE;
-        static VkDevice                 g_Device = VK_NULL_HANDLE;
-        static uint32_t                 g_QueueFamily = (uint32_t)-1;
-        static VkQueue                  g_Queue = VK_NULL_HANDLE;
-        static VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
-        static VkPipelineCache          g_PipelineCache = VK_NULL_HANDLE;
-        static VkDescriptorPool         g_DescriptorPool = VK_NULL_HANDLE;
-        static ImGui_ImplVulkanH_Window g_MainWindowData;
-        static int                      g_MinImageCount = 2;
-        static bool                     g_SwapChainRebuild = false;
+        extern VkAllocationCallbacks*       g_Allocator;
+        extern VkInstance                   g_Instance;
+        extern VkPhysicalDevice             g_PhysicalDevice;
+        extern VkDevice                     g_Device;
+        extern uint32_t                     g_QueueFamily;
+        extern VkQueue                      g_Queue;
+        extern VkDebugReportCallbackEXT     g_DebugReport;
+        extern VkPipelineCache              g_PipelineCache;
+        extern VkDescriptorPool             g_DescriptorPool;
+        extern ImGui_ImplVulkanH_Window     g_MainWindowData;
+        extern int                          g_MinImageCount;
+        extern bool                         g_SwapChainRebuild;
 
-        static std::vector<std::vector<VkCommandBuffer>> g_AllocatedCommandBuffers;
-        static std::vector<std::vector<std::function<void()>>> g_ResourceFreeQueue;
+        extern GLFWwindow*                  g_glfwWindow;
+        extern ImGui_ImplVulkanH_Window*    g_vulkanWindow;
 
-        static uint32_t g_CurrentFrameIndex = 0;
+        extern std::vector<std::vector<VkCommandBuffer>> g_AllocatedCommandBuffers;
+        extern std::vector<std::vector<std::function<void()>>> g_ResourceFreeQueue;
 
-        static std::vector<std::shared_ptr<Layer>> g_LayerStack {};
+        extern uint32_t g_CurrentFrameIndex;
+
+        extern std::vector<std::shared_ptr<Layer>> g_LayerStack;
 
         bool IsExtensionAvailable(const ImVector<VkExtensionProperties>& properties, const char* extension);
         VkPhysicalDevice SetupVulkan_SelectPhysicalDevice();
@@ -86,7 +89,9 @@ namespace Colosseum {
         void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
         void FramePresent(ImGui_ImplVulkanH_Window* wd);
 
+        int Initialise();
         int Run();
+        int Cleanup();
         void AddLayer(std::shared_ptr<Layer> layer_ptr);
         void RemoveLayer(std::shared_ptr<Layer> layer_ptr);
 

@@ -49,3 +49,8 @@ file(GLOB_RECURSE SRC CONFIGURE_DEPENDS *.cpp)
 add_executable(Colloseum ${SRC} ${IMGUI_SRC})
 target_link_libraries(Colloseum ${LIBRARIES})
 target_compile_definitions(Colloseum PUBLIC -DImTextureID=ImU64)
+target_compile_definitions(Colloseum
+    PRIVATE
+        # If the debug configuration pass the DEBUG define to the compiler 
+        $<$<CONFIG:Debug>:COLOSSEUM_DEBUG_MODE>
+)
